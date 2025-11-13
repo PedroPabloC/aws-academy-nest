@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { Alumno } from './entities/alumno.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AlumnosService {
@@ -10,8 +10,12 @@ export class AlumnosService {
 
   create(createAlumnoDto: CreateAlumnoDto) {
     const newAlumno: Alumno = {
-      id: uuidv4(),
-      ...createAlumnoDto,
+      // Si el DTO trae un ID, úsalo. Si no, genera uno.
+      id: createAlumnoDto.id || uuid(),
+      nombres: createAlumnoDto.nombres,
+      apellidos: createAlumnoDto.apellidos,
+      matricula: createAlumnoDto.matricula,
+      promedio: createAlumnoDto.promedio,
     };
     this.alumnos.push(newAlumno);
     return newAlumno;
