@@ -1,17 +1,21 @@
+// src/profesores/profesores.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProfesoreDto } from './dto/create-profesore.dto';
-import { UpdateProfesoreDto } from './dto/update-profesore.dto';
-import { Profesor } from './entities/profesore.entity';
-import { v4 as uuidv4 } from 'uuid';
+import { CreateProfesorDto } from './dto/create-profesor.dto';
+import { UpdateProfesorDto } from './dto/update-profesor.dto';
+import { Profesor } from './entities/profesor.entity';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ProfesoresService {
   private profesores: Profesor[] = [];
 
-  create(createProfesoreDto: CreateProfesoreDto) {
+  create(createProfesorDto: CreateProfesorDto) {
     const newProfesor: Profesor = {
-      id: uuidv4(),
-      ...createProfesoreDto,
+      id: createProfesorDto.id || uuid(),
+      nombres: createProfesorDto.nombres,
+      apellidos: createProfesorDto.apellidos,
+      numeroEmpleado: createProfesorDto.numeroEmpleado,
+      horasClase: createProfesorDto.horasClase,
     };
     this.profesores.push(newProfesor);
     return newProfesor;
@@ -29,13 +33,11 @@ export class ProfesoresService {
     return profesor;
   }
 
-  update(id: string, updateProfesoreDto: UpdateProfesoreDto) {
+  update(id: string, updateProfesorDto: UpdateProfesorDto) {
     const profesor = this.findOne(id);
     const index = this.profesores.findIndex((p) => p.id === id);
-
-    const profesorActualizado = { ...profesor, ...updateProfesoreDto };
+    const profesorActualizado = { ...profesor, ...updateProfesorDto };
     this.profesores[index] = profesorActualizado;
-
     return profesorActualizado;
   }
 
