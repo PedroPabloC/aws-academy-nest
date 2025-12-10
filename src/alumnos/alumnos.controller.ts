@@ -8,6 +8,7 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AlumnosService } from './alumnos.service';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
@@ -15,7 +16,7 @@ import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 
 @Controller('alumnos')
 export class AlumnosController {
-  constructor(private readonly alumnosService: AlumnosService) {}
+  constructor(private readonly alumnosService: AlumnosService) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -29,17 +30,17 @@ export class AlumnosController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.alumnosService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateAlumnoDto: UpdateAlumnoDto) {
     return this.alumnosService.update(id, updateAlumnoDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.alumnosService.remove(id);
   }
 

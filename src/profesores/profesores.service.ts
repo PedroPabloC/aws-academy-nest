@@ -1,49 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProfesorDto } from './dto/create-profesor.dto';
 import { UpdateProfesorDto } from './dto/update-profesor.dto';
 import { Profesor } from './entities/profesor.entity';
 
 @Injectable()
 export class ProfesoresService {
-  private profesores: Profesor[] = [];
+  constructor(
+    @InjectRepository(Profesor)
+    private profesoresRepository: Repository<Profesor>,
+  ) { }
 
-  create(createProfesorDto: CreateProfesorDto) {
-    const newProfesor: Profesor = {
-      id: createProfesorDto.id || Math.floor(Math.random() * 1000000),
-      nombres: createProfesorDto.nombres,
-      apellidos: createProfesorDto.apellidos,
-      numeroEmpleado: createProfesorDto.numeroEmpleado,
-      horasClase: createProfesorDto.horasClase,
-    };
-    this.profesores.push(newProfesor);
-    return newProfesor;
+  async create(createProfesorDto: CreateProfesorDto) {
+    const newProfesor = this.profesoresRepository.create(createProfesorDto);
+    return await this.profesoresRepository.save(newProfesor);
   }
 
-  findAll() {
-    return this.profesores;
+  async findAll() {
+    return await this.profesoresRepository.find();
   }
 
-  findOne(id: string) {
-    const numericId = parseInt(id, 10);
-    const profesor = this.profesores.find((p) => p.id === numericId);
+  async findOne(id: number) {
+    const profesor = await this.profesoresRepository.findOneBy({ id });
     if (!profesor) {
       throw new NotFoundException(`Profesor con id ${id} no encontrado`);
     }
     return profesor;
   }
 
-  update(id: string, updateProfesorDto: UpdateProfesorDto) {
-    const numericId = parseInt(id, 10);
-    const profesor = this.findOne(id);
-    const index = this.profesores.findIndex((p) => p.id === numericId);
+  async update(id: number, updateProfesorDto: UpdateProfesorDto) {
+    const profesor = await this.findOne(id);
     const profesorActualizado = { ...profesor, ...updateProfesorDto };
-    this.profesores[index] = profesorActualizado;
+    await this.profesoresRepository.save(profesorActualizado);
     return profesorActualizado;
   }
 
-  remove(id: string) {
-    const numericId = parseInt(id, 10);
-    const profesor = this.findOne(id);
-    this.profesores = this.profesores.filter((p) => p.id !== numericId);
+  async remove(id: number) {
+    const profesor = await this.findOne(id);
+    await this.profesoresRepository.remove(profesor);
   }
 }

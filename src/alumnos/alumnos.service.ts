@@ -1,51 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
-import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 import { Alumno } from './entities/alumno.entity';
 
 @Injectable()
 export class AlumnosService {
-  private alumnos: Alumno[] = [];
+  constructor(
+    @InjectRepository(Alumno)
+    private alumnosRepository: Repository<Alumno>,
+  ) { }
 
-  create(createAlumnoDto: CreateAlumnoDto) {
-    const newAlumno: Alumno = {
-      nombres: createAlumnoDto.nombres,
-      apellidos: createAlumnoDto.apellidos,
-      matricula: createAlumnoDto.matricula,
-      promedio: createAlumnoDto.promedio,
-      id: createAlumnoDto.id || Math.floor(Math.random() * 1000000),
-    };
-    this.alumnos.push(newAlumno);
-    return newAlumno;
+  async create(createAlumnoDto: CreateAlumnoDto): Promise<Alumno> {
+    const nuevoAlumno = this.alumnosRepository.create(createAlumnoDto);
+    return await this.alumnosRepository.save(nuevoAlumno);
   }
 
-  findAll() {
-    return this.alumnos;
+  async findAll(): Promise<Alumno[]> {
+    return await this.alumnosRepository.find();
   }
 
-  findOne(id: string) {
-    const numericId = parseInt(id, 10);
-    const alumno = this.alumnos.find((a) => a.id === numericId);
+  async findOne(id: number): Promise<Alumno> {
+    const alumno = await this.alumnosRepository.findOneBy({ id });
     if (!alumno) {
       throw new NotFoundException(`Alumno con id ${id} no encontrado`);
     }
     return alumno;
   }
 
-  update(id: string, updateAlumnoDto: UpdateAlumnoDto) {
-    const alumno = this.findOne(id);
-    const numericId = parseInt(id, 10);
-    const index = this.alumnos.findIndex((a) => a.id === numericId);
-
-    const alumnoActualizado = { ...alumno, ...updateAlumnoDto };
-    this.alumnos[index] = alumnoActualizado;
-
-    return alumnoActualizado;
+  async update(id: number, updateAlumnoDto: any): Promise<Alumno> {
+    await this.alumnosRepository.update(id, updateAlumnoDto);
+    return this.findOne(id);
   }
 
-  remove(id: string) {
-    const alumno = this.findOne(id);
-    const numericId = parseInt(id, 10);
-    this.alumnos = this.alumnos.filter((a) => a.id !== numericId);
+  async remove(id: number): Promise<void> {
+    await this.alumnosRepository.delete(id);
   }
 }
