@@ -61,6 +61,13 @@ export class AlumnosService {
     return this.findOne(id);
   }
 
+  async remove(id: number): Promise<void> {
+    const result = await this.alumnosRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Alumno con id ${id} no encontrado`);
+    }
+  }
+
   // --- LÓGICA AWS (SNS, DYNAMO, S3) ---
 
   async enviarNotificacion(id: number) {

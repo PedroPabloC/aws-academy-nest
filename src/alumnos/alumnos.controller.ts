@@ -8,10 +8,15 @@ import {
   UseInterceptors,
   UploadedFile,
   Get,
+  Put,
+  Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { AlumnosService } from './alumnos.service';
 import type { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateAlumnoDto } from './dto/create-alumno.dto';
+import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 
 @Controller('alumnos')
 export class AlumnosController {
@@ -19,9 +24,30 @@ export class AlumnosController {
 
   // --- Endpoints existentes ---
 
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  create(@Body() createAlumnoDto: CreateAlumnoDto) {
+    return this.alumnosService.create(createAlumnoDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.alumnosService.findAll();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.alumnosService.findOne(+id);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {
+    return this.alumnosService.update(+id, updateAlumnoDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.alumnosService.remove(+id);
   }
 
   @Post(':id/email')
@@ -61,5 +87,11 @@ export class AlumnosController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.alumnosService.uploadProfilePicture(+id, file);
+  }
+
+  @Delete()
+  @HttpCode(HttpStatus.METHOD_NOT_ALLOWED)
+  deleteBase() {
+    return;
   }
 }
