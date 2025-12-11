@@ -16,7 +16,7 @@ import { UpdateProfesorDto } from './dto/update-profesor.dto';
 
 @Controller('profesores')
 export class ProfesoresController {
-  constructor(private readonly profesoresService: ProfesoresService) { }
+  constructor(private readonly profesoresService: ProfesoresService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

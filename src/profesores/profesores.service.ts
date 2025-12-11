@@ -10,7 +10,7 @@ export class ProfesoresService {
   constructor(
     @InjectRepository(Profesor)
     private profesoresRepository: Repository<Profesor>,
-  ) { }
+  ) {}
 
   async create(createProfesorDto: CreateProfesorDto) {
     const newProfesor = this.profesoresRepository.create(createProfesorDto);
